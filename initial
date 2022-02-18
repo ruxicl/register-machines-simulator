@@ -1,0 +1,53 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
+#define REG_STR "registers"
+#define REG_STR_LENGTH 9
+#define NL -1
+
+vector <long long> registers;
+vector <string> labels;
+
+void regSpec() {
+    
+    string line;
+    
+    bool isSpecValid = true;
+    
+    // getline(cin, line);
+    
+    while (isSpecValid) {
+        registers.push_back(getNr());
+        
+    }
+}
+
+
+
+// Q: Are the initial values of the registers positive?
+int getNr() {
+    do {
+        ch = fgetc(stdin);
+    } while (ch == ' ' || ch == '\t');
+    
+    int nr;
+    
+    if (ch == '\n')
+        nr = NL;
+    else {
+        nr = 0;
+        while (ch >='0' && ch <='9') {
+            nr = nr * 10 + (ch - '0');
+            ch = fgetc(stdin);
+        }
+    }
+        
+    return nr;
+}
+
+int main() {
+    
+    regSpec();
+    return 0;
+}
