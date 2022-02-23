@@ -14,7 +14,7 @@ using namespace std;
 #define INC "inc"
 #define DECJZ "decjz"
 #define HALT "HALT"
-#define NONE -1
+#define NONE "noLabel"
 
 #define NO_ERROR 0 
 #define LABEL_ALREADY_DEFINED 1
@@ -36,6 +36,8 @@ int lineIndex;
 int nrLines;
 
 char errorMessage;
+
+bool printTrace;
 
 void regSpec();
 void program();
@@ -81,10 +83,20 @@ void program() {
     nrLines = lineIndex;
 }
 
+void printRegisters() {
+    for (int i = 0; i < registers.size(); ++i)
+        printf("%lld ", registers[i]);
+    printf("\n");
+}
+
 void execute() {
     int i = 0;
     bool halt = false;
     while (i < nrLines && !halt) {
+
+        if (printTrace)
+            printRegisters();
+
         int regNr = programLines[i].registerNr;
         if(programLines[i].instType == INC) {
             ++registers[regNr];
@@ -108,11 +120,11 @@ void execute() {
 
 void output() {
     printf("%s ", REG_STR);
-    for (int i = 0; i < registers.size(); ++i)
-        printf("%lld ", registers[i]);
+    printRegisters();
 }
 
 Instruction getLabInst() {
+    skipSP();
     string labelOrInstr = getStr();
     skipSP();
 
@@ -156,9 +168,11 @@ Instruction getLabInst() {
 void searchUndefinedLabels() {
     bool anyUndefLabels = false;
     for (Instruction instr : programLines) {
-        string label = instr.labelToJumpTo;
-        if(label != HALT && !labels.count(label)) // if we need to jump to an unexistent label
-            anyUndefLabels = true;
+        if (instr.instType == DECJZ) {
+            string label = instr.labelToJumpTo;
+            if(label != HALT && !labels.count(label)) // if we need to jump to an unexistent label
+                anyUndefLabels = true;
+        }
     }
     if(anyUndefLabels) 
         errorMessage = UNDEFINED_LABEL;
@@ -218,7 +232,12 @@ void skipSP() {
         currentCh = fgetc(stdin);
 }
 
-int main() {
+int main(int argc, char **argv) {
+
+    // command line flag -t prints a trace of the execution of the register machine
+    for(int i = 1; i < argc; ++i) 
+        if(!strcmp(argv[i], "-t"))
+            printTrace = true;
     
     input();
     errorCheck();
@@ -246,6 +265,7 @@ int main() {
         int line = it->second;
         printf("%s %d\n", label.c_str(), line);
     }
-    printf("nr of instruction lines is %d", nrLines);*/
+    printf("nr of instruction lines is %d", nrLines); */
+
     return 0;
 }
