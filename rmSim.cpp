@@ -37,6 +37,14 @@ int nrLines;
 
 char errorMessage;
 
+void regSpec();
+void program();
+
+void input() {
+    regSpec();
+    program();
+}
+
 bool isAlpha(char ch);
 bool isDigit(char ch);
 void skipSP();
@@ -47,7 +55,7 @@ void regSpec() {
     currentCh = fgetc(stdin);
     getStr(); // read 'registers'
     
-    while (currentCh != NL) {
+    while (currentCh != NL && currentCh != EOF) {
         skipSP();
         registers.push_back(getNr());
     }    
@@ -56,11 +64,19 @@ void regSpec() {
 int getRegister();
 Instruction getLabInst();
 
+// Note: echo adds a new line at the end of the output, so check for both \n + EOF and EOF
 void program() {
     while (currentCh != EOF) {
         currentCh = fgetc(stdin);
-        programLines.push_back(getLabInst());
-        ++lineIndex;
+        while (currentCh == '#') { // skip comments
+                string commentLine;
+                getline(cin, commentLine);
+                currentCh = fgetc(stdin);
+        }
+        if (currentCh != EOF) {
+            programLines.push_back(getLabInst());
+            ++lineIndex;
+        }
     }
     nrLines = lineIndex;
 }
@@ -91,6 +107,7 @@ void execute() {
 }
 
 void output() {
+    printf("%s ", REG_STR);
     for (int i = 0; i < registers.size(); ++i)
         printf("%lld ", registers[i]);
 }
@@ -203,16 +220,14 @@ void skipSP() {
 
 int main() {
     
-    regSpec();
-    program();
+    input();
     errorCheck();
     execute();
-    printf("\n Output:");
     output();
 
     // Testing
 
-    printf("\n");
+    /* printf("\n");
 
     for (int i = 0; i < registers.size(); ++i)
         printf("%lld ", registers[i]);
@@ -231,6 +246,6 @@ int main() {
         int line = it->second;
         printf("%s %d\n", label.c_str(), line);
     }
-    printf("nr of instruction lines is %d", nrLines);
+    printf("nr of instruction lines is %d", nrLines);*/
     return 0;
 }
