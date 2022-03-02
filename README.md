@@ -2,9 +2,10 @@
 
 ## Overview
 Note: Part of a uni coursework
-- about register machines
 
-Instructions:
+Simulates the execution of a RM program. 
+
+RM Instructions:
 - INC(i), _increase_: add 1 to register i
 - DECJZ(i, j), _decrease or jump on zero_: subtract 1 from register i or to jump to instruction I<sub>j</sub> if register i is 0
 
